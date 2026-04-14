@@ -10,8 +10,8 @@ Each module is written one at a time with full explanation before moving on.
 | # | File | Status | Concepts |
 |---|------|--------|----------|
 | 1 | `shared/utils/config.py` | done | YAML loading, frozen dataclasses, type annotations |
-| 2 | `shared/utils/visualize.py` | pending | matplotlib, plotting loss/accuracy curves |
-| 3 | `shared/data/transforms.py` | pending | tensor normalisation, image augmentation |
+| 2 | `shared/utils/visualize.py` | done | matplotlib, plotting loss/accuracy curves |
+| 3 | `shared/data/transforms.py` | done | tensor normalisation, image augmentation |
 | 4 | `shared/data/dataset.py` | pending | `torch.utils.data.Dataset`, base64 decode, random split, `DataLoader` |
 | 5 | `shared/models/mlp_head.py` | pending | `nn.Module`, `nn.Linear`, `nn.ReLU`, forward pass |
 | 6 | `shared/models/cnn_backbone.py` | pending | `nn.Conv2d`, `nn.MaxPool2d`, spatial → vector, stride vs pooling |

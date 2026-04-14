@@ -1,11 +1,51 @@
 """
 Config loader: reads an experiment's config.yaml and returns a frozen dataclass.
 
-Usage:
-    cfg = load_config("curved_road/exp1/config.yaml")
-    cfg.training.lr       # float
-    cfg.training.epochs   # int
-    cfg.data.val_split    # float
+# ---------------------------------------------------------------------------
+# WHAT PROBLEM DOES THIS SOLVE?
+# ---------------------------------------------------------------------------
+# Every experiment has settings like lr, epochs, batch_size.
+# Without a config loader you have two bad options:
+#   1. Hardcode values in training code → must edit code to change them
+#   2. Pass them all as command-line args → tedious and error-prone
+#
+# A config loader lets you change an experiment by editing only config.yaml.
+# The code never changes — only the config does.
+
+# ---------------------------------------------------------------------------
+# KEY CONCEPTS YOU WILL LEARN HERE
+# ---------------------------------------------------------------------------
+# 1. YAML — a human-friendly format for structured data. Python's pyyaml
+#    library reads a .yaml file into a plain Python dict.
+#
+# 2. Frozen dataclass — a Python class that holds data with typed fields
+#    that CANNOT be changed after creation (frozen = immutable).
+#    Instead of cfg["training"]["lr"] (fragile dict access), you get
+#    cfg.training.lr (typed, autocompleted, crashes on typos).
+#
+# 3. WHY FROZEN? If config could be mutated mid-training, a bug could
+#    silently change your learning rate halfway through a run. Frozen
+#    makes config a contract: set once at startup, never touched again.
+
+# ---------------------------------------------------------------------------
+# STRUCTURE
+# ---------------------------------------------------------------------------
+# The config.yaml has 4 sections. Each becomes its own frozen dataclass:
+#
+#   config.yaml          →    Python
+#   ─────────────────────────────────────────
+#   data:                →    DataConfig
+#   model:               →    ModelConfig
+#   training:            →    TrainingConfig
+#   (top level)          →    ExperimentConfig  (contains the 3 above)
+
+# ---------------------------------------------------------------------------
+# USAGE
+# ---------------------------------------------------------------------------
+#   cfg = load_config("curved_road/exp1/config.yaml")
+#   cfg.training.lr       # float
+#   cfg.training.epochs   # int
+#   cfg.data.val_split    # float
 """
 
 # Allow writing type hints like `str | Path` without errors on Python 3.11.

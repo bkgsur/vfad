@@ -12,8 +12,10 @@ so the user can isolate and understand what each component contributes.
 
 **Learning rules:**
 - Explain every concept before writing the code for it
-- Every source file must contain inline comments explaining each line and concept — not just what, but why
-- The file itself is the learning material — explanations must live in the code, not only in chat
+- Every source file must have a rich module docstring with these sections:
+  WHAT PROBLEM DOES THIS SOLVE / KEY CONCEPTS YOU WILL LEARN HERE / STRUCTURE / USAGE
+- Every source file must contain inline comments on every non-obvious line — not just what, but why
+- The file itself is the learning material — all explanations must live in the code, not only in chat
 - Never skip ahead — understanding matters more than speed
 - This project IS the VLA curriculum, not just a coding exercise
 
