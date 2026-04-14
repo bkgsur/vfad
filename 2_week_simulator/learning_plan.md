@@ -12,8 +12,8 @@ Each module is written one at a time with full explanation before moving on.
 | 1 | `shared/utils/config.py` | done | YAML loading, frozen dataclasses, type annotations |
 | 2 | `shared/utils/visualize.py` | done | matplotlib, plotting loss/accuracy curves |
 | 3 | `shared/data/transforms.py` | done | tensor normalisation, image augmentation |
-| 4 | `shared/data/dataset.py` | pending | `torch.utils.data.Dataset`, base64 decode, random split, `DataLoader` |
-| 5 | `shared/models/mlp_head.py` | pending | `nn.Module`, `nn.Linear`, `nn.ReLU`, forward pass |
+| 4 | `shared/data/dataset.py` | done | `torch.utils.data.Dataset`, base64 decode, random split, `DataLoader` |
+| 5 | `shared/models/mlp_head.py` | done | `nn.Module`, `nn.Linear`, `nn.ReLU`, forward pass |
 | 6 | `shared/models/cnn_backbone.py` | pending | `nn.Conv2d`, `nn.MaxPool2d`, spatial → vector, stride vs pooling |
 | 7 | `shared/models/language_encoder.py` | pending | `nn.Embedding`, lookup tables, integer IDs → dense vectors |
 | 8 | `shared/training/metrics.py` | pending | sigmoid threshold, per-action accuracy |
