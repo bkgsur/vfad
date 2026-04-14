@@ -1,0 +1,22 @@
+experiment: exp1
+description: "Vision CNN (3-conv + MLP) — curved road baseline"
+
+data:
+  training_data_dir: curved_road/exp1/training-data
+  val_split: 0.2
+  seed: 42
+
+model:
+  cnn_variant: 3conv
+  feature_dim: 64
+  mlp_hidden_dim: 64
+  num_actions: 4
+
+training:
+  epochs: 80
+  batch_size: 32
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: cosine
+
+results_dir: results/curved_road/exp1

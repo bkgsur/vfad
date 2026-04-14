@@ -1,0 +1,47 @@
+[project]
+name = "vfad-sim"
+version = "0.1.0"
+description = "VLA architecture progression experiments — curved and forked road"
+requires-python = ">=3.11"
+
+dependencies = [
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "Pillow>=10.0.0",
+    "numpy>=1.26.0",
+    "pyyaml>=6.0",
+    "matplotlib>=3.8.0",
+]
+
+[project.scripts]
+exp1 = "curved_road.exp1.__main__:main"
+exp2 = "curved_road.exp2.__main__:main"
+exp3 = "curved_road.exp3.__main__:main"
+exp4 = "forked_road.exp4.__main__:main"
+exp5 = "forked_road.exp5.__main__:main"
+exp6 = "forked_road.exp6.__main__:main"
+exp7 = "forked_road.exp7.__main__:main"
+exp8 = "forked_road.exp8.__main__:main"
+exp9 = "forked_road.exp9.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

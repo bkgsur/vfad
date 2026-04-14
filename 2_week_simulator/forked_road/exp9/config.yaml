@@ -1,0 +1,29 @@
+experiment: exp9
+description: "ACT + Language + CVAE — forked road"
+
+data:
+  training_data_dir: forked_road/exp9/training-data
+  val_split: 0.2
+  seed: 42
+
+model:
+  cnn_variant: 4conv
+  feature_dim: 128
+  lang_dim: 32
+  transformer_d_model: 128
+  transformer_nhead: 4
+  transformer_num_layers: 2
+  chunk_size: 10
+  latent_dim: 32
+  cvae_beta: 1.0
+  num_actions: 4
+  num_intents: 2
+
+training:
+  epochs: 80
+  batch_size: 32
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: cosine
+
+results_dir: results/forked_road/exp9

@@ -1,0 +1,25 @@
+experiment: exp6
+description: "ACT (CNN + Transformer Enc/Dec) — forked road"
+
+data:
+  training_data_dir: forked_road/exp6/training-data
+  val_split: 0.2
+  seed: 42
+
+model:
+  cnn_variant: 4conv
+  feature_dim: 128
+  transformer_d_model: 128
+  transformer_nhead: 4
+  transformer_num_layers: 2
+  chunk_size: 10
+  num_actions: 4
+
+training:
+  epochs: 80
+  batch_size: 32
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: cosine
+
+results_dir: results/forked_road/exp6
