@@ -14,9 +14,9 @@ Each module is written one at a time with full explanation before moving on.
 | 3 | `shared/data/transforms.py` | done | tensor normalisation, image augmentation |
 | 4 | `shared/data/dataset.py` | done | `torch.utils.data.Dataset`, base64 decode, random split, `DataLoader` |
 | 5 | `shared/models/mlp_head.py` | done | `nn.Module`, `nn.Linear`, `nn.ReLU`, forward pass |
-| 6 | `shared/models/cnn_backbone.py` | pending | `nn.Conv2d`, `nn.MaxPool2d`, spatial → vector, stride vs pooling |
+| 6 | `shared/models/cnn_backbone.py` | done | `nn.Conv2d`, `nn.AdaptiveAvgPool2d`, spatial → vector, stride vs pooling |
 | 7 | `shared/models/language_encoder.py` | pending | `nn.Embedding`, lookup tables, integer IDs → dense vectors |
-| 8 | `shared/training/metrics.py` | pending | sigmoid threshold, per-action accuracy |
+| 8 | `shared/training/metrics.py` | done | sigmoid threshold, per-action accuracy |
 | 9 | `shared/training/callbacks.py` | pending | stateful objects, best-model tracking, early stopping |
 | 10 | `shared/training/trainer.py` | pending | training loop, `loss.backward()`, optimizer, scheduler, device |
 | 11 | `shared/models/transformer.py` | pending | attention, positional encoding, action chunking |

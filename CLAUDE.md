@@ -21,6 +21,25 @@ so the user can isolate and understand what each component contributes.
 
 ---
 
+## Planned: `wiki/` (build after Exp 1 trains)
+
+A Karpathy-style persistent wiki at the vfad root covering the **entire project**.
+Reference: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f
+
+```
+wiki/
+    concepts/       ← one page per ML concept (CNN, MLP, BCELoss, Transformer, CVAE...)
+    experiments/    ← one page per experiment with results + what was learned
+    architecture/   ← how shared modules compose into full models
+    glossary.md
+    SCHEMA.md       ← rules guiding how the wiki is maintained
+```
+
+Build trigger: Exp 1 trains successfully → ingest first batch of concepts + results.
+After each experiment: ingest new results, update concept pages.
+
+---
+
 ## Active Work: `2_week_simulator/`
 
 ### Always read at session start
