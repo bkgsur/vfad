@@ -116,7 +116,7 @@ from typing import Any
 import torch
 import torch.nn as nn
 
-from shared.training.metrics import compute_accuracy
+from shared.training.metrics import compute_metrics
 
 
 class Trainer:
@@ -237,11 +237,8 @@ class Trainer:
         all_labels: list[torch.Tensor] = []
 
         for batch in loader:
-            # Each batch is a dict with keys "image", "actions", and
-            # optionally "instruction_id" (forked road experiments).
-            # Move tensors to the device before any computation.
-            images = batch["image"].to(self.device)    # (B, 3, 128, 128)
-            labels = batch["actions"].to(self.device)  # (B, 4)  — float 0/1
+            # Each batch is a (images, actions) tuple collated by DataLoader.
+            labels = batch[1].to(self.device)   # (B, 4) float 0/1
 
             # ── Step 1: zero_grad ─────────────────────────────────────
             # PyTorch accumulates gradients across calls to .backward().
@@ -289,7 +286,7 @@ class Trainer:
         epoch_logits = torch.cat(all_logits, dim=0)   # (N, 4)
         epoch_labels = torch.cat(all_labels, dim=0)   # (N, 4)
 
-        accuracy = compute_accuracy(epoch_logits, epoch_labels)
+        accuracy = compute_metrics(epoch_logits, epoch_labels)
 
         return mean_loss, accuracy
 
@@ -314,11 +311,10 @@ class Trainer:
         # wasteful. no_grad saves memory and makes validation faster.
         with torch.no_grad():
             for batch in loader:
-                images = batch["image"].to(self.device)    # (B, 3, 128, 128)
-                labels = batch["actions"].to(self.device)  # (B, 4)
+                labels = batch[1].to(self.device)   # (B, 4)
 
-                logits = self._forward(batch)              # (B, 4)
-                loss = self.criterion(logits, labels)      # scalar
+                logits = self._forward(batch)        # (B, 4)
+                loss = self.criterion(logits, labels)  # scalar
 
                 total_loss += loss.item()
                 all_logits.append(logits)
@@ -329,31 +325,30 @@ class Trainer:
         epoch_logits = torch.cat(all_logits, dim=0)   # (N, 4)
         epoch_labels = torch.cat(all_labels, dim=0)   # (N, 4)
 
-        accuracy = compute_accuracy(epoch_logits, epoch_labels)
+        accuracy = compute_metrics(epoch_logits, epoch_labels)
 
         return mean_loss, accuracy
 
-    def _forward(self, batch: dict) -> torch.Tensor:
+    def _forward(self, batch: tuple) -> torch.Tensor:
         """Route a batch through the model.
 
-        Most experiments only use images. Language experiments (Exp 5, 8, 9)
-        also pass instruction_ids. The model's forward() signature handles
-        both cases — we just pass whatever the batch contains.
+        batch is a (images, labels) tuple from the DataLoader.
+        Language experiments (Exp 5, 8, 9) extend this to a 3-tuple
+        (images, labels, instruction_ids) — the model handles both cases.
 
         Returns
         -------
         logits : (B, 4) raw action logits
         """
-        images = batch["image"].to(self.device)   # (B, 3, 128, 128)
+        images = batch[0].to(self.device)   # (B, 3, 128, 128)
 
-        if "instruction_id" in batch:
-            # Language experiments: pass both image and instruction ID.
-            # The model concatenates CNN features + language embedding internally.
-            instruction_ids = batch["instruction_id"].to(self.device)  # (B,)
-            return self.model(images, instruction_ids)                  # (B, 4)
+        if len(batch) == 3:
+            # Language experiments: (images, labels, instruction_ids)
+            instruction_ids = batch[2].to(self.device)   # (B,)
+            return self.model(images, instruction_ids)   # (B, 4)
         else:
-            # Vision-only experiments (Exp 1, 2, 3, 4, 6, 7).
-            return self.model(images)                                   # (B, 4)
+            # Vision-only experiments (Exp 1, 2, 3, 4, 6, 7)
+            return self.model(images)                    # (B, 4)
 
     def _run_callbacks(self, epoch: int, val_loss: float) -> bool:
         """Call all callbacks and return True if any requests early stopping."""
@@ -393,8 +388,8 @@ class Trainer:
         self.history["train_loss"].append(train_loss)
         self.history["val_loss"].append(val_loss)
         # Store aggregate accuracy as the headline number.
-        self.history["train_acc"].append(train_acc["aggregate"])
-        self.history["val_acc"].append(val_acc["aggregate"])
+        self.history["train_acc"].append(train_acc["acc"])
+        self.history["val_acc"].append(val_acc["acc"])
 
         # Print one line per epoch so the user can watch training progress.
         # Format: epoch | train_loss | val_loss | train_acc | val_acc
@@ -402,6 +397,6 @@ class Trainer:
             f"Epoch {epoch + 1:>4d} | "
             f"train_loss {train_loss:.4f} | "
             f"val_loss {val_loss:.4f} | "
-            f"train_acc {train_acc['aggregate']:.3f} | "
-            f"val_acc {val_acc['aggregate']:.3f}"
+            f"train_acc {train_acc['acc']:.3f} | "
+            f"val_acc {val_acc['acc']:.3f}"
         )
