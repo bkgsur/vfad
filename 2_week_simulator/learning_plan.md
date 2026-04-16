@@ -19,9 +19,9 @@ Each module is written one at a time with full explanation before moving on.
 | 8 | `shared/training/metrics.py` | done | sigmoid threshold, per-action accuracy |
 | 9 | `shared/training/callbacks.py` | done | stateful objects, best-model tracking, early stopping |
 | 10 | `shared/training/trainer.py` | done | training loop, `loss.backward()`, optimizer, scheduler, device |
-| 11 | `shared/models/transformer.py` | pending | attention, positional encoding, action chunking |
-| 12 | `shared/models/cvae.py` | pending | latent space, reparameterisation trick, KL divergence, ELBO loss |
-| 13 | `shared/utils/exporter.py` | pending | `state_dict()`, flattening tensors, writing model.json |
+| 11 | `shared/models/transformer.py` | done | attention, positional encoding, action chunking |
+| 12 | `shared/models/cvae.py` | done | latent space, reparameterisation trick, KL divergence, ELBO loss |
+| 13 | `shared/utils/exporter.py` | done | `state_dict()`, flattening tensors, writing model.json |
 
 Update status to `done` as each module is completed.
 
