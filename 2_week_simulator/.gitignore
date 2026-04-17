@@ -10,6 +10,7 @@ uv.lock
 
 # Training artifacts
 results/
+runs/
 *.pt
 *.pth
 

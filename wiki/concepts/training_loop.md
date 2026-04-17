@@ -66,3 +66,4 @@ downhill for every single weight simultaneously.
 - [BCELoss](bce_loss.md) — the loss being minimised
 - [Callbacks](callbacks.md) — checkpointing and early stopping that wrap the loop
 - [Metrics](metrics.md) — accuracy computed after each epoch
+- [TensorBoard](tensorboard.md) — visualising weights, gradients, and loss during training

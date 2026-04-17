@@ -115,6 +115,7 @@ from typing import Any
 
 import torch
 import torch.nn as nn
+from torch.utils.tensorboard import SummaryWriter
 
 from shared.training.metrics import compute_metrics
 
@@ -140,6 +141,7 @@ class Trainer:
         scheduler: Any | None,
         callbacks: list,
         device: torch.device,
+        log_dir: str | Path | None = None,
     ) -> None:
         self.model = model
         self.criterion = criterion
@@ -151,6 +153,11 @@ class Trainer:
         # history stores per-epoch metrics so callers can plot curves later.
         # Structure: { "train_loss": [...], "val_loss": [...], "train_acc": [...], ... }
         self.history: dict[str, list[float]] = {}
+
+        # TensorBoard writer — writes event files that `tensorboard --logdir` reads.
+        # If log_dir is None, TensorBoard logging is disabled.
+        # log_dir is typically "runs/<exp_name>" so each experiment gets its own folder.
+        self.writer = SummaryWriter(log_dir=str(log_dir)) if log_dir is not None else None
 
     # ------------------------------------------------------------------
     # Public API
@@ -196,6 +203,10 @@ class Trainer:
 
             # ── Log metrics ────────────────────────────────────────────
             self._log(epoch, train_loss, val_loss, train_acc, val_acc)
+
+            # ── TensorBoard ────────────────────────────────────────────
+            if self.writer is not None:
+                self._tb_log(epoch, train_loss, val_loss, train_acc, val_acc)
 
             # ── Callbacks ─────────────────────────────────────────────
             # Each callback receives the epoch index, val loss, and model.
@@ -400,3 +411,69 @@ class Trainer:
             f"train_acc {train_acc['acc']:.3f} | "
             f"val_acc {val_acc['acc']:.3f}"
         )
+
+    def _tb_log(
+        self,
+        epoch: int,
+        train_loss: float,
+        val_loss: float,
+        train_acc: dict[str, float],
+        val_acc: dict[str, float],
+    ) -> None:
+        """Write one epoch of metrics, weights, and gradients to TensorBoard.
+
+        WHY THREE TYPES OF LOGGING?
+        ─────────────────────────────
+        1. Scalars (loss, accuracy, lr)
+           The headline numbers. Loss curve shape tells you immediately
+           whether training is healthy, overfitting, or stuck.
+
+        2. Weight histograms (add_histogram on param.data)
+           Shows the DISTRIBUTION of each layer's weights over time.
+           Healthy weights spread out from their random init into a
+           bell-shaped distribution centred near 0.
+           Dead weights (all near 0) mean that layer isn't contributing.
+
+        3. Gradient histograms (add_histogram on param.grad)
+           Shows HOW MUCH each layer's weights changed this epoch.
+           Large gradients = layer learning fast.
+           Near-zero gradients = layer barely updating (vanishing gradient).
+           This reveals which layers are doing the real work.
+        """
+        w = self.writer   # shorthand
+
+        # ── 1. Loss scalars ────────────────────────────────────────────
+        # add_scalars writes two lines on the same chart for easy comparison.
+        w.add_scalars("Loss", {"train": train_loss, "val": val_loss}, epoch)
+
+        # ── 2. Per-action accuracy ─────────────────────────────────────
+        # compute_metrics() returns keys: "acc", "acc_forward", "acc_backward",
+        # "acc_left", "acc_right" — use those exact key names.
+        for key in ("acc", "acc_forward", "acc_backward", "acc_left", "acc_right"):
+            w.add_scalars(
+                f"Accuracy/{key}",
+                {"train": train_acc[key], "val": val_acc[key]},
+                epoch,
+            )
+
+        # ── 3. Learning rate ───────────────────────────────────────────
+        # ReduceLROnPlateau silently drops the lr — log it so you can see
+        # exactly when the scheduler fires and how the loss responds.
+        current_lr = self.optimizer.param_groups[0]["lr"]
+        w.add_scalar("LearningRate", current_lr, epoch)
+
+        # ── 4. Weight and gradient histograms per layer ────────────────
+        for name, param in self.model.named_parameters():
+            # Weight distribution — how the learned values are spread.
+            # tag format: "Weights/backbone.conv1.weight" etc.
+            w.add_histogram(f"Weights/{name}", param.data.cpu(), epoch)
+
+            # Gradient distribution — how much this layer updated this epoch.
+            # param.grad is None if the layer has no gradient (e.g. frozen).
+            if param.grad is not None:
+                w.add_histogram(f"Gradients/{name}", param.grad.cpu(), epoch)
+
+    def close(self) -> None:
+        """Flush and close the TensorBoard writer. Call after fit() completes."""
+        if self.writer is not None:
+            self.writer.close()

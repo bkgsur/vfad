@@ -119,6 +119,11 @@ def main() -> None:
     ]
 
     # ── 7. Train ──────────────────────────────────────────────────────
+    # log_dir: TensorBoard writes event files here.
+    # "runs/exp1" keeps each experiment's logs separate.
+    # Launch TensorBoard with: tensorboard --logdir runs/
+    log_dir = Path(__file__).parent.parent.parent / "runs" / "exp1"
+
     trainer = Trainer(
         model=model,
         criterion=criterion,
@@ -126,6 +131,7 @@ def main() -> None:
         scheduler=scheduler,
         callbacks=callbacks,
         device=device,
+        log_dir=log_dir,
     )
 
     history = trainer.fit(
@@ -133,6 +139,9 @@ def main() -> None:
         val_loader=val_loader,
         epochs=cfg.training.epochs,
     )
+
+    # Close the TensorBoard writer to flush all buffered events to disk.
+    trainer.close()
 
     # ── 8. Save metrics.json ──────────────────────────────────────────
     # visualize.plot_curves() reads metrics.json from results_dir.

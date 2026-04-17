@@ -14,6 +14,7 @@ Every page in this wiki, one line each. Read this first when looking for anythin
 | [Training Loop](concepts/training_loop.md) | zero_grad → forward → loss → backward → step — the core 5-step update cycle |
 | [Callbacks](concepts/callbacks.md) | CheckpointCallback saves best weights; EarlyStoppingCallback halts stalled training |
 | [Metrics](concepts/metrics.md) | Per-action accuracy — why left@77.5% matters more than aggregate@91.4% |
+| [TensorBoard](concepts/tensorboard.md) | Live dashboard for loss curves, weight histograms, and gradient flow during training |
 
 ---
 
